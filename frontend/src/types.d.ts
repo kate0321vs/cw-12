@@ -39,3 +39,17 @@ export interface ValidationError {
 export interface GlobalError {
     error: string;
 }
+
+export interface IActivity {
+    user: { _id: string; displayName: string; };
+    title: string;
+    description: string;
+    image: string;
+    isPublished: boolean;
+}
+
+export interface IActivityMutation {
+    title: string;
+    description: string;
+    image: File;
+}

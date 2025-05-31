@@ -29,5 +29,5 @@ const UsersListSchema = new Schema({
     },
 })
 
-const UsersList = model("User", UsersListSchema);
+const UsersList = model("UsersList", UsersListSchema);
 export default UsersList;
