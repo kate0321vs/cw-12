@@ -9,6 +9,8 @@ import {activitiesFetch, deleteActivity, makePublicActivity} from "../activities
 import { toast } from "react-toastify";
 import {selectDeleteActivityLoading, selectPublicLoading} from "../activitiesSlice.ts";
 import {NavLink} from "react-router-dom";
+import ModalCard from "./ModalCard.tsx";
+import {useState} from "react";
 
 interface Props {
     title: string;
@@ -16,13 +18,16 @@ interface Props {
     isPublished: boolean;
     author: { displayName: string; _id: string };
     id: string;
+    description: string;
 }
 
-const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author}) => {
+const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author, description}) => {
     const user = useAppSelector(selectUser);
     const dispatch = useAppDispatch();
     const deleteLoading = useAppSelector(selectDeleteActivityLoading);
     const publishLoading = useAppSelector(selectPublicLoading);
+
+    const [open, setOpen] = useState(false);
 
     const onPublic = async () => {
         if (window.confirm(`Published activity ${title}?`)) {
@@ -40,12 +45,15 @@ const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author}) 
         }
     }
 
-    console.log(author)
-
     return (
         <Grid sx={{width: 400, mb: 3, boxShadow: 3, borderRadius: 3}}>
             <Card>
-                <CardActionArea>
+                <ModalCard open={open} handleClose={() => setOpen(false)}
+                           title={title}
+                           description={description}
+                           image={image}
+                           author={author}/>
+                <CardActionArea onClick={() => setOpen(true)}>
                     <CardMedia
                         sx={{height: 300, width: 400}}
                         image={baseURL + '/' + image}
@@ -60,7 +68,7 @@ const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author}) 
                         justifyContent: 'space-between'
                     }}>
                     <Grid>
-                        <Typography color='black' sx={{textDecoration: "none"}}  variant='h5'>{title}</Typography>
+                        <Typography color='black' sx={{textDecoration: "none", display:"block"}} component={NavLink} to={`/activities/${id}`}  variant='h5'>{title}</Typography>
                         <Typography color='black' sx={{textDecoration: "none"}} component={NavLink} to={`/activities?userId=${author._id}`} variant='body1'><b>Author: </b>{author.displayName}</Typography>
                     </Grid>
                     {user && user.role === 'admin' &&

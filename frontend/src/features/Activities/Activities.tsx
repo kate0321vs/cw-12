@@ -55,6 +55,7 @@ const Activities = () => {
                                         isPublished={activity.isPublished}
                                         id={activity._id}
                                         author={activity.user}
+                                        description={activity.description}
                                     />
                                 );
                             })}

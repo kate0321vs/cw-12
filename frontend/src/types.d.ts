@@ -52,5 +52,5 @@ export interface IActivity {
 export interface IActivityMutation {
     title: string;
     description: string;
-    image: File;
+    image: File | null;
 }

@@ -60,7 +60,10 @@ activitiesRouter.get("/", async (req, res) => {
 activitiesRouter.get("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const activity = await Activity.findById(id);
+        const activity = await Activity.findById(id).populate({
+            path: "user",
+            select: "displayName"
+        });
         if (!activity) {
             res.status(404).send({error: "Could not find activity"});
         }
