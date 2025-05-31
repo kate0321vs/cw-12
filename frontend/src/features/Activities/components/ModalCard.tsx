@@ -6,7 +6,13 @@ import {
     CardMedia,
 } from "@mui/material";
 import {baseURL} from "../../../globalConstants.ts";
-import {useAppDispatch} from "../../../app/hooks.ts";
+import {useAppDispatch, useAppSelector} from "../../../app/hooks.ts";
+import {addToList, fetchList} from "../../UsersAndActivitiesList/UsersAndActivitiesThunk.ts";
+import {selectList} from "../../UsersAndActivitiesList/usersAndActivitiesListSlice.ts";
+import {selectUser} from "../../Users/usersSlice.ts";
+import {useEffect} from "react";
+import {activitiesFetch} from "../activitiesThunk.ts";
+import {toast} from "react-toastify";
 
 const style = {
     position: "absolute",
@@ -29,14 +35,30 @@ interface Props {
     title: string;
     description: string;
     author: {displayName: string; _id: string};
+    id: string;
 }
 
-const ModalCard: React.FC<Props> = ({ open, handleClose, image, title, description,author }) => {
+const ModalCard: React.FC<Props> = ({ open, handleClose, image, title, description, author, id }) => {
+    const user = useAppSelector(selectUser);
     const dispatch = useAppDispatch();
+    const list = useAppSelector(selectList);
 
-   const addToActivity = () => {
+    useEffect( () => {
+        if (open) {
+            dispatch(fetchList(null));
+        }
+    }, [open, dispatch]);
 
-    }
+
+
+    const addToActivity = async () => {
+        await dispatch(addToList(id));
+        await dispatch(fetchList(null));
+        toast.success("You have joined the group")
+        await dispatch(activitiesFetch(null))
+    };
+
+    const isUserJoined = list.some(item => item.user._id === user?._id || item.activity._id === id);
 
     return (
         <Modal open={open} onClose={handleClose}>
@@ -62,9 +84,11 @@ const ModalCard: React.FC<Props> = ({ open, handleClose, image, title, descripti
                 </Box>
 
                 <Box mt={2} display="flex" justifyContent="center" gap={2}>
-                    <Button variant="contained" color="primary" onClick={addToActivity}>
-                        Join
-                    </Button>
+                    {user && !isUserJoined && user.role !== 'admin' &&
+                        <Button variant="contained" color="primary" onClick={addToActivity}>
+                            Join
+                        </Button>
+                    }
                     <Button variant="outlined" onClick={handleClose}>
                         Close
                     </Button>

@@ -54,3 +54,8 @@ export interface IActivityMutation {
     description: string;
     image: File | null;
 }
+
+export interface IList {
+    user: {_id: string, displayName: string};
+    activity: {_id: string; title: string};
+}

@@ -14,8 +14,6 @@ const FullInfoActivity = () => {
     const loading = useAppSelector(selectOneActivityLoading);
     const {id} = useParams() as { id: string };
 
-    console.log(activity);
-
     useEffect(() => {
         dispatch(oneActivityFetch(id));
     }, [dispatch, id]);

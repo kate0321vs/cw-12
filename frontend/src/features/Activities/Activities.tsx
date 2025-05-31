@@ -7,6 +7,7 @@ import ActivityItem from "./components/ActivityItem.tsx";
 import {activitiesFetch} from "./activitiesThunk.ts";
 import {useEffect} from "react";
 import {selectUser} from "../Users/usersSlice.ts";
+import {fetchList} from "../UsersAndActivitiesList/UsersAndActivitiesThunk.ts";
 
 const Activities = () => {
     const dispatch = useAppDispatch();
@@ -16,13 +17,17 @@ const Activities = () => {
     const activities = useAppSelector(selectActivities);
     const user = useAppSelector(selectUser)
 
+
     useEffect(() => {
         if (!userId) {
             dispatch(activitiesFetch(null));
+            dispatch(fetchList(null));
         } else {
             dispatch(activitiesFetch(userId));
+            dispatch(fetchList(null));
         }
     }, [dispatch, userId]);
+
 
     return (
         <>

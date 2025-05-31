@@ -1,12 +1,12 @@
-import { Card, CardActionArea, CardContent, CardMedia, CircularProgress, IconButton, Typography } from "@mui/material";
+import {Card, CardActionArea, CardContent, CardMedia, CircularProgress, IconButton, Typography} from "@mui/material";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { baseURL } from "../../../globalConstants.ts";
+import {baseURL} from "../../../globalConstants.ts";
 import {useAppDispatch, useAppSelector} from "../../../app/hooks.ts";
-import { selectUser } from "../../Users/usersSlice.ts";
+import {selectUser} from "../../Users/usersSlice.ts";
 import {activitiesFetch, deleteActivity, makePublicActivity} from "../activitiesThunk.ts";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import {selectDeleteActivityLoading, selectPublicLoading} from "../activitiesSlice.ts";
 import {NavLink} from "react-router-dom";
 import ModalCard from "./ModalCard.tsx";
@@ -52,7 +52,8 @@ const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author, d
                            title={title}
                            description={description}
                            image={image}
-                           author={author}/>
+                           author={author}
+                id={id}/>
                 <CardActionArea onClick={() => setOpen(true)}>
                     <CardMedia
                         sx={{height: 300, width: 400}}
@@ -68,22 +69,26 @@ const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author, d
                         justifyContent: 'space-between'
                     }}>
                     <Grid>
-                        <Typography color='black' sx={{textDecoration: "none", display:"block"}} component={NavLink} to={`/activities/${id}`}  variant='h5'>{title}</Typography>
-                        <Typography color='black' sx={{textDecoration: "none"}} component={NavLink} to={`/activities?userId=${author._id}`} variant='body1'><b>Author: </b>{author.displayName}</Typography>
+                        <Typography color='black' sx={{textDecoration: "none", display: "block"}} component={NavLink}
+                                    to={`/activities/${id}`} variant='h5'>{title}</Typography>
+                        <Typography color='black' sx={{textDecoration: "none"}} component={NavLink}
+                                    to={`/activities?userId=${author._id}`}
+                                    variant='body1'><b>Author: </b>{author.displayName}</Typography>
                     </Grid>
                     {user && user.role === 'admin' &&
                         <Grid sx={{height: 50}}>
                             {!isPublished && (
-                            <>
-                                <Typography variant="body2" color="warning" pr={1}>Unpublished</Typography>
-                                <IconButton title='Public' onClick={onPublic}>
-                                    {publishLoading === id ? <CircularProgress size={22}/> : <CheckCircleIcon color='warning'/> }
-                                </IconButton>
-                            </>
-                        )}
+                                <>
+                                    <Typography variant="body2" color="warning" pr={1}>Unpublished</Typography>
+                                    <IconButton title='Public' onClick={onPublic}>
+                                        {publishLoading === id ? <CircularProgress size={22}/> :
+                                            <CheckCircleIcon color='warning'/>}
+                                    </IconButton>
+                                </>
+                            )}
                             <IconButton onClick={onDelete}
                                         title="Delete">
-                                {deleteLoading === id ? <CircularProgress size={22}/> : <DeleteIcon color='error'/>  }
+                                {deleteLoading === id ? <CircularProgress size={22}/> : <DeleteIcon color='error'/>}
                             </IconButton>
                         </Grid>
                     }
