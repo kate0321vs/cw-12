@@ -2,7 +2,6 @@ import express from "express";
 import auth, {RequestWithUser} from "../middleware/auth";
 import UsersList from "../models/UsersList";
 import Activity from "../models/Activity";
-import permit from "../middleware/permit";
 
 const usersListRouter = express.Router();
 
@@ -21,7 +20,7 @@ usersListRouter.get("/", auth, async (req, res) => {
            res.status(404).send("User not found");
            return
        }
-      const activitiesList = await UsersList.find({user: user._id}).populate("activity", ["title", "image"]);
+      const activitiesList = await UsersList.find({user: user._id}).populate("activity", ["title", "image"]).populate("user", "displayName");
        res.send(activitiesList);
    } catch (error) {
        res.status(500).send(error);
@@ -56,7 +55,7 @@ usersListRouter.post("/", auth, async (req, res) => {
     }
 });
 
-usersListRouter.delete("/", auth, permit('admin'), async (req, res) => {
+usersListRouter.delete("/", auth, async (req, res) => {
     try {
         const user = (req as RequestWithUser).user;
         const activityId = req.query.activityId;
@@ -66,7 +65,29 @@ usersListRouter.delete("/", auth, permit('admin'), async (req, res) => {
             return
         }
 
-        const entry = await UsersList.findOne({ user: user._id, activity: activityId });
+        let entry;
+
+        if (user.role === "admin") {
+            const targetUserId = req.body._id;
+
+            if (!targetUserId) {
+                 res.status(400).send({ error: "Missing user _id in request body for admin" });
+                return
+            }
+
+            entry = await UsersList.findOne({ user: targetUserId, activity: activityId });
+
+            if (!entry) {
+                 res.status(404).send({ error: "This user is not part of this activity" });
+                return
+            }
+
+            await UsersList.deleteOne({ _id: entry._id });
+             res.send({ message: "User has been removed from the activity by admin" });
+            return
+        }
+
+        entry = await UsersList.findOne({ user: user._id, activity: activityId });
 
         if (!entry) {
              res.status(404).send({ error: "You are not part of this activity" });
@@ -74,12 +95,11 @@ usersListRouter.delete("/", auth, permit('admin'), async (req, res) => {
         }
 
         await UsersList.deleteOne({ _id: entry._id });
-
         res.send({ message: "You have been removed from the activity" });
+
     } catch (error) {
         res.status(500).send(error);
     }
-});
-
+    });
 
 export default usersListRouter;

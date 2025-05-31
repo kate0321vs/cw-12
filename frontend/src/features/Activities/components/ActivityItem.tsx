@@ -1,4 +1,4 @@
-import {Card, CardActionArea, CardContent, CardMedia, CircularProgress, IconButton, Typography} from "@mui/material";
+import { Card, CardActionArea, CardContent, CardMedia, CircularProgress, IconButton, Typography} from "@mui/material";
 import Grid from "@mui/material/Grid";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -10,7 +10,9 @@ import {toast} from "react-toastify";
 import {selectDeleteActivityLoading, selectPublicLoading} from "../activitiesSlice.ts";
 import {NavLink} from "react-router-dom";
 import ModalCard from "./ModalCard.tsx";
-import {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {fetchList} from "../../UsersAndActivitiesList/UsersAndActivitiesThunk.ts";
+
 
 interface Props {
     title: string;
@@ -28,6 +30,10 @@ const ActivityItem: React.FC<Props> = ({title, image, id, isPublished, author, d
     const publishLoading = useAppSelector(selectPublicLoading);
 
     const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        dispatch(fetchList(id));
+    }, [dispatch]);
 
     const onPublic = async () => {
         if (window.confirm(`Published activity ${title}?`)) {

@@ -20,9 +20,20 @@ export const addToList = createAsyncThunk<void, string>(
     }
 );
 
-export const deleteTrack = createAsyncThunk<void, string>(
-    "usersList/delete",
-    async (id) => {
-        await axiosApi.delete(`usersList/${id}`);
+interface DeleteUserFromListArgs {
+    activityId: string;
+    userId?: string;
+}
+
+export const deleteFromUserList = createAsyncThunk<void, DeleteUserFromListArgs>(
+    "usersAndActivities/deleteFromList",
+    async ({ activityId, userId }, thunkAPI) => {
+        try {
+            await axiosApi.delete(`/usersList?activityId=${activityId}`, {
+                data: userId ? { _id: userId } : undefined,
+            });
+        } catch (e) {
+            return thunkAPI.rejectWithValue("Failed to delete user");
+        }
     }
 );

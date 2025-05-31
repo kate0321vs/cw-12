@@ -1,25 +1,44 @@
-import { Box, Typography, Button, CardMedia, Container, CircularProgress } from "@mui/material";
+import {Box, Typography, Button, CardMedia, Container, CircularProgress, IconButton} from "@mui/material";
 import {baseURL} from "../../globalConstants.ts";
 import {selectOneActivity, selectOneActivityLoading} from "./activitiesSlice.ts";
 import {useAppDispatch, useAppSelector } from "../../app/hooks.ts";
 import { useEffect } from "react";
-import {useParams} from "react-router-dom";
-import {oneActivityFetch} from "./activitiesThunk.ts";
-
-
+import {useNavigate, useParams} from "react-router-dom";
+import {activitiesFetch, oneActivityFetch} from "./activitiesThunk.ts";
+import CloseIcon from "@mui/icons-material/Close";
+import {selectList} from "../UsersAndActivitiesList/usersAndActivitiesListSlice.ts";
+import {deleteFromUserList, fetchList} from "../UsersAndActivitiesList/UsersAndActivitiesThunk.ts";
+import { selectUser } from "../Users/usersSlice.ts";
+import { toast } from "react-toastify";
 
 const FullInfoActivity = () => {
     const dispatch = useAppDispatch();
     const activity = useAppSelector(selectOneActivity);
     const loading = useAppSelector(selectOneActivityLoading);
     const {id} = useParams() as { id: string };
+    const usersList = useAppSelector(selectList);
+    const user = useAppSelector(selectUser);
+    const navigate = useNavigate();
 
     useEffect(() => {
         dispatch(oneActivityFetch(id));
+        dispatch(fetchList(id))
     }, [dispatch, id]);
 
-    const onLeave = () => {
+    const onLeave = async () => {
+        if (id) {
+           await dispatch(deleteFromUserList({activityId: id}));
+           await dispatch(activitiesFetch(null));
+           toast.error("you left the group")
+           navigate("/")
+        }
+    }
 
+    const isUserDeleted = usersList.some(item => item.user._id === user?._id || item.activity._id === id);
+
+    const onDeleteUser = async (id_user: string) => {
+        await dispatch(deleteFromUserList({activityId: id, userId: id_user, }));
+        await dispatch(fetchList(id))
     }
 
     return (
@@ -49,12 +68,43 @@ const FullInfoActivity = () => {
                             </Typography>
 
                             <Box display="flex" justifyContent="flex-end">
-                                <Button variant="outlined" onClick={onLeave}>
+                                {!isUserDeleted || user &&
+                                    <Button variant="outlined" onClick={onLeave}>
                                     Leave
-                                </Button>
+                                </Button>}
                             </Box>
                         </Box>
                     </Box>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Group people
+                        </Typography>
+                        {usersList.length > 0 ?
+                            <Box sx={{ p: 4, }}>
+
+                                {usersList.map((item) => (
+                                    <Box
+                                        key={item.user._id}
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            borderBottom: "1px solid #ccc",
+                                            px: 2,
+                                            py: 1,
+                                        }}
+                                    >
+                                        <Typography>{item.user.displayName}</Typography>
+                                        {user && user.role === "admin" &&
+                                            <IconButton >
+                                                <CloseIcon onClick={() => onDeleteUser(item.user._id)}/>
+                                            </IconButton>
+                                        }
+                                    </Box>
+                                ))}
+                            </Box>
+                        :
+                            <Typography>No users yet</Typography>
+                        }
                 </Container>) :
                     <Typography>Activity not found</Typography>
             }

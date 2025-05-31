@@ -4,6 +4,7 @@ import User from "../models/User";
 import auth, {RequestWithUser} from "../middleware/auth";
 import {imagesUpload} from "../middleware/multer";
 import permit from "../middleware/permit";
+import UsersList from "../models/UsersList";
 
 const activitiesRouter = express.Router();
 
@@ -105,6 +106,10 @@ activitiesRouter.delete("/:id", auth, async (req, res) => {
         }
 
         await Activity.deleteOne({_id: req.params.id});
+
+        await UsersList.deleteMany({activity: req.params.id})
+
+
         res.send({message: 'Cocktail deleted successfully'});
     } catch (error) {
         res.status(500).send(error);

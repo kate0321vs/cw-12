@@ -1,6 +1,6 @@
 import {IList} from "../../types";
 import {createSlice} from "@reduxjs/toolkit";
-import {addToList, deleteTrack, fetchList} from "./UsersAndActivitiesThunk.ts";
+import {addToList, deleteFromUserList, fetchList} from "./UsersAndActivitiesThunk.ts";
 import {RootState} from "../../app/store.ts";
 
 interface UsersAndActivitiesListState {
@@ -43,13 +43,13 @@ export const usersAndActivitiesListSlice = createSlice({
             state.addToListLoading = false;
         });
 
-        builder.addCase(deleteTrack.pending, (state) => {
+        builder.addCase(deleteFromUserList.pending, (state) => {
             state.deleteFromListLoading = true;
         });
-        builder.addCase(deleteTrack.fulfilled, (state) => {
+        builder.addCase(deleteFromUserList.fulfilled, (state) => {
             state.deleteFromListLoading = false;
         });
-        builder.addCase(deleteTrack.rejected, (state) => {
+        builder.addCase(deleteFromUserList.rejected, (state) => {
             state.deleteFromListLoading = false;
         });
     }
