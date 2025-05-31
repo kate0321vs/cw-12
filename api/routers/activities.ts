@@ -13,10 +13,17 @@ activitiesRouter.get("/", async (req, res) => {
         let activities
         const jwtToken = req.get("Authorization")?.replace("Bearer ", "");
         if (!jwtToken) {
-            activities = await Activity.find({isPublished: true}).populate({
-                path: "user",
-                select: "displayName role"
-            });
+            if(userId) {
+                activities = await Activity.find({ user: userId, isPublished: true }).populate({
+                    path: "user",
+                    select: "displayName"
+                });
+            } else {
+                activities = await Activity.find({isPublished: true}).populate({
+                    path: "user",
+                    select: "displayName role"
+                });
+            }
             res.send(activities);
             return;
         } else {
@@ -26,7 +33,7 @@ activitiesRouter.get("/", async (req, res) => {
                 return;
             }
             if (userId) {
-                activities = await Activity.find({user: userId}).populate({
+                activities = await Activity.find({ user: userId }).populate({
                     path: "user",
                     select: "displayName"
                 });

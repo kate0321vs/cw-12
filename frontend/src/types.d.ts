@@ -41,6 +41,7 @@ export interface GlobalError {
 }
 
 export interface IActivity {
+    _id: string;
     user: { _id: string; displayName: string; };
     title: string;
     description: string;

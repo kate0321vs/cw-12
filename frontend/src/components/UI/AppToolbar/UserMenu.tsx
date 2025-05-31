@@ -6,6 +6,8 @@ import {useAppDispatch} from "../../../app/hooks.ts";
 import {unsetUser} from "../../../features/Users/usersSlice.ts";
 import {toast} from "react-toastify";
 import MenuIcon from '@mui/icons-material/Menu';
+import {NavLink, useNavigate} from "react-router-dom";
+import {activitiesFetch} from "../../../features/Activities/activitiesThunk.ts";
 
 interface Props {
     user: IUser;
@@ -14,6 +16,7 @@ interface Props {
 const UserMenu: React.FC<Props> = ({user}) => {
     const dispatch = useAppDispatch();
     const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+    const navigate = useNavigate();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -26,6 +29,8 @@ const UserMenu: React.FC<Props> = ({user}) => {
     const handleLogout = async () => {
         await dispatch(logout());
         dispatch(unsetUser());
+        await dispatch(activitiesFetch(null));
+        navigate('/');
         handleClose();
         toast.success("Logout successfully.");
     }
@@ -42,6 +47,7 @@ const UserMenu: React.FC<Props> = ({user}) => {
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
             >
+                <MenuItem component={NavLink} to={`/activities?userId=${user._id}`}>My activities</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
         </>

@@ -1,5 +1,5 @@
-import axiosApi from "../axiosApi.ts";
-import {IActivity, IActivityMutation} from "../types";
+import axiosApi from "../../axiosApi.ts";
+import {IActivity, IActivityMutation} from "../../types";
 import {createAsyncThunk} from "@reduxjs/toolkit";
 
 export const activitiesFetch = createAsyncThunk<IActivity[], string | null> (

@@ -1,4 +1,4 @@
-import {IActivity} from "../types";
+import {IActivity} from "../../types";
 import {createSlice} from "@reduxjs/toolkit";
 import {
     activitiesFetch,
@@ -7,6 +7,7 @@ import {
     makePublicActivity,
     oneActivityFetch
 } from "./activitiesThunk.ts";
+import {RootState} from "../../app/store.ts";
 
 interface activitiesState {
     activities: IActivity[];
@@ -85,4 +86,14 @@ export const activitiesSlice = createSlice({
             state.publicLoading = false;
         });
     }
-})
+});
+
+export const selectActivities = (state: RootState) => state.activities.activities;
+export const selectOneActivity = (state: RootState) => state.activities.activity;
+export const selectActivitiesLoading = (state: RootState) => state.activities.fetchActivitiesLoading;
+export const selectOneActivityLoading = (state: RootState) => state.activities.fetchOneActivityLoading;
+export const selectCreateActivityLoading = (state: RootState) => state.activities.createLoading;
+export const selectDeleteActivityLoading = (state: RootState) => state.activities.deleteLoading;
+export const selectPublicLoading = (state: RootState) => state.activities.publicLoading;
+
+export const activitiesReducer = activitiesSlice.reducer;
